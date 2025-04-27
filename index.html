@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TikTok Video Downloader" />
+    <title>TikTok Video Downloader</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
+    <style>
+      body {
+        background-color: #f9f9f9;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .result-area {
+        display: none;
+      }
+      .loading {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container text-center">
+      <h1 class="text-primary">TikTok Video Downloader</h1>
+      <p>Enter a TikTok video URL to fetch download links:</p>
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          id="video-url"
+          class="form-control"
+          placeholder="Enter TikTok video URL" />
+        <div class="input-group-append">
+          <button class="btn btn-primary" id="fetch-btn">Fetch</button>
+        </div>
+      </div>
+      <div class="loading text-center">
+        <p>Loading...</p>
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <div class="result-area mt-4">
+        <h3>Download Links</h3>
+        <a
+          href="#"
+          id="video-link"
+          class="btn btn-success"
+          target="_blank"
+          download
+          >Download Video</a
+        >
+        <a
+          href="#"
+          id="music-link"
+          class="btn btn-info"
+          target="_blank"
+          download
+          >Download Music</a
+        >
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("fetch-btn")
+        .addEventListener("click", async () => {
+          const videoUrl = document.getElementById("video-url").value.trim();
+          const loading = document.querySelector(".loading");
+          const resultArea = document.querySelector(".result-area");
+          const videoLink = document.getElementById("video-link");
+          const musicLink = document.getElementById("music-link");
+
+          if (!videoUrl.includes("tiktok.com")) {
+            alert("Please enter a valid TikTok URL.");
+            return;
+          }
+
+          loading.style.display = "block";
+          resultArea.style.display = "none";
+
+          try {
+            // Replace with your proxy server URL
+            const response = await fetch(
+              `http://localhost:3000/api/tiktok?url=${encodeURIComponent(
+                videoUrl
+              )}`
+            );
+            if (!response.ok) {
+              throw new Error("Failed to fetch video data");
+            }
+
+            const data = await response.json();
+            loading.style.display = "none";
+            resultArea.style.display = "block";
+
+            // Update the download links
+            videoLink.href = data.videoUrl;
+            videoLink.textContent = "Download Video";
+
+            musicLink.href = data.musicUrl;
+            musicLink.textContent = "Download Music";
+          } catch (error) {
+            console.error(error);
+            alert("Failed to fetch video. Please try again.");
+            loading.style.display = "none";
+          }
+        });
+    </script>
+  </body>
+</html>
